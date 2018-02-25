@@ -40,7 +40,7 @@ global IMAGE_BRIGHTNESS
 global img
 
 IMAGE_BRIGHTNESS = 0.3
-img = Image.open("~/mouth.bmp")
+img = Image.open("/home/pi/mouth.bmp")
 hashtag = "#mkscrollbot"
 Show_Mouth = True
 Consumer_Key = "zKY68rSx4pJ6AmNAzPvmDsuBz"
@@ -66,6 +66,18 @@ class perpetualTimer():
 
    def cancel(self):
       self.thread.cancel()
+
+def Check_Internet():
+    try:
+        url = "https://www.google.com"
+        urllib.urlopen(url)
+        status = "Connected"
+    except:
+        status = "Not connected"
+        return False
+    print status
+    if status == "Connected":
+        return True
 
 def Hashtag_Search():
     if True:
@@ -159,17 +171,20 @@ def clock():
     time.sleep(15)
 
 def scroll_message(message):
-    scrollphathd.clear()
-    scrollphathd.show()
-    message_length = scrollphathd.write_string(message, x=0, y=0,brightness=IMAGE_BRIGHTNESS)
-    while message_length > 0:
+    if message is None:
+        return False
+    else:
+        scrollphathd.clear()
         scrollphathd.show()
-        scrollphathd.scroll(1)
-        message_length -= 1
-        time.sleep(0.04)
-    scrollphathd.clear()
-    scrollphathd.show()
-    time.sleep(0.25)
+        message_length = scrollphathd.write_string(message, x=0, y=0,brightness=IMAGE_BRIGHTNESS)
+        while message_length > 0:
+            scrollphathd.show()
+            scrollphathd.scroll(1)
+            message_length -= 1
+            time.sleep(0.04)
+        scrollphathd.clear()
+        scrollphathd.show()
+        time.sleep(0.25)
 
 # The height and width of the forest. Same as Scroll pHAT HD
 # dimensions
@@ -287,7 +302,8 @@ def Robot_Mouth():
         if time.time() - last_weather_time > (30*60):
             scrollphathd.clear()
             scrollphathd.show()
-            print_weather()
+            if Check_Internet():
+                print_weather()
             last_weather_time = time.time()
             for x in range(0, scrollphathd.DISPLAY_WIDTH):
                 for y in range(0, scrollphathd.DISPLAY_HEIGHT):
@@ -298,7 +314,8 @@ def Robot_Mouth():
         if time.time() - last_tweet_time > (5 * 60):
             scrollphathd.clear()
             scrollphathd.show()
-            print_hashtag()
+            if Check_Internet():
+                print_hashtag()
             last_tweet_time = time.time()
             for x in range(0, scrollphathd.DISPLAY_WIDTH):
                 for y in range(0, scrollphathd.DISPLAY_HEIGHT):
@@ -310,7 +327,7 @@ def Robot_Mouth():
 
 def main():
     scrollphathd.rotate(degrees=180)
-
+    Check_Internet()
     Fire()
 
 if __name__ == '__main__':
